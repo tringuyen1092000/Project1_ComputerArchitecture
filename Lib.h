@@ -4,24 +4,27 @@ using namespace std;
 #include <limits.h>
 #include <bitset>
 #include <string>
+#define MAX 100
 
-class QInt
-{
+class QInt {
 private:
-    long long arrBits[2];
+	unsigned long long arrBit[2];
 public:
-    void setBit(long long value, int pos);
-	long long getBit(int pos);
+	QInt();
+	void setBit(unsigned long long value, int pos);
+	unsigned long long getBit(int pos);
 	string toBase2();
 	string toBase10();
 	string toBase16();
-public:
-    QInt();
-    ~QInt();
 };
 
+QInt* toQInt(string number, int oldBase);
+bool isSmaller(string str1, string str2);
+string largeSubtract(string str1, string str2);
+string largeSum(string str1, string str2);
+int multiply(int x, int res[], int res_size);
+string power(int x, int n);
 string divBy2(string number);
 string base16Table(char c);
 char base16Table(string s);
 string strToBase2(string number, int oldBase);
-QInt* toQInt(string number, int oldBase);
