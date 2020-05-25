@@ -4,7 +4,7 @@ bool isSmaller(string str1, string str2){
 	int n1 = str1.length(), n2 = str2.length();
 	if (n1 < n2)
 		return true;
-	if (n2 > n1)
+	if (n1 > n2)
 		return false;
 	for (int i = 0; i < n1; i++){
 		if (str1[i] < str2[i])
@@ -25,7 +25,7 @@ string largeSubtract(string str1, string str2) {
 	for (int i = n2 - 1; i >= 0; i--) {
 		int sub = ((str1[i + diff] - '0') - (str2[i] - '0') - carry);
 		if (sub < 0) {
-			sub = sub + 10;
+			sub += 10;
 			carry = 1;
 		}
 		else
@@ -38,7 +38,7 @@ string largeSubtract(string str1, string str2) {
 			str.insert(str.begin(), '9');
 			continue;
 		}
-		int sub = ((str1[i] - '0') - carry);
+		int sub = (str1[i] - '0') - carry;
 		if (i > 0 || sub > 0)
 			str.insert(str.begin(), sub + '0');
 		carry = 0;
@@ -164,7 +164,7 @@ char base16Table(string s) {
 	if (s == "1101") return 'D';
 	if (s == "1110") return 'E';
 	if (s == "1111") return 'F';
-	return '\0';
+	return NULL;
 }
 
 string strToBase2(string number, int oldBase) {
@@ -172,6 +172,7 @@ string strToBase2(string number, int oldBase) {
 		return number;
 	}
 	else if (oldBase == 10) {
+		if (number == "0") return number;
 		bool sign = false;
 		if (number[0] != '-') {
 			sign = false;
@@ -294,10 +295,248 @@ QInt* toQInt(string number, int oldBase) {
 		newQInt->setBit(b.to_ullong(), 1);
 	}
 	else {
-		bitset<64> b(tmp.substr(0, l));
+		bitset<64> b(tmp);
 		newQInt->setBit(b.to_ullong(), 1);
 	}
 	return newQInt;
+}
+
+QInt operator&(const QInt& q1, const QInt& q2){
+	QInt result;
+	bitset<64> a(q1.arrBit[0]);
+	bitset<64> b(q1.arrBit[1]);
+	bitset<64> c(q2.arrBit[0]);
+	bitset<64> d(q2.arrBit[1]);
+	bitset<128> e(a.to_string() + b.to_string());
+	bitset<128> f(c.to_string() + d.to_string());
+	bitset<128> bitArr = e & f;
+	result = *toQInt(bitArr.to_string(), 2);
+	return result;
+}
+
+QInt operator|(const QInt& q1, const QInt& q2){
+	QInt result;
+	bitset<64> a(q1.arrBit[0]);
+	bitset<64> b(q1.arrBit[1]);
+	bitset<64> c(q2.arrBit[0]);
+	bitset<64> d(q2.arrBit[1]);
+	bitset<128> e(a.to_string() + b.to_string());
+	bitset<128> f(c.to_string() + d.to_string());
+	bitset<128> bitArr = e | f;
+	result = *toQInt(bitArr.to_string(), 2);
+	return result;
+}
+
+QInt operator^(const QInt& q1, const QInt& q2){
+	QInt result;
+	bitset<64> a(q1.arrBit[0]);
+	bitset<64> b(q1.arrBit[1]);
+	bitset<64> c(q2.arrBit[0]);
+	bitset<64> d(q2.arrBit[1]);
+	bitset<128> e(a.to_string() + b.to_string());
+	bitset<128> f(c.to_string() + d.to_string());
+	bitset<128> bitArr = e ^ f;
+	result = *toQInt(bitArr.to_string(), 2);
+	return result;
+}
+
+QInt operator~(const QInt& q){
+	QInt result;
+	bitset<64> a(q.arrBit[0]);
+	bitset<64> b(q.arrBit[1]);
+	bitset<128> c(a.to_string() + b.to_string());
+	c = c.flip();
+	string tmp1 = c.to_string().substr(0, 64);
+	string tmp2 = c.to_string().substr(64, 64);
+	result = *toQInt(tmp1 + tmp2, 2);
+	return result;
+}
+
+void QInt::operator=(const QInt& q) {
+	this->arrBit[0] = q.arrBit[0];
+	this->arrBit[1] = q.arrBit[1];
+}
+
+QInt operator+(const QInt& q1, const QInt& q2) {
+	QInt result;
+	bitset<64> a(q1.arrBit[0]);
+	bitset<64> b(q1.arrBit[1]);
+	bitset<64> c(q2.arrBit[0]);
+	bitset<64> d(q2.arrBit[1]);
+	bitset<128> e(a.to_string() + b.to_string());
+	bitset<128> f(c.to_string() + d.to_string());	
+	bitset<128> bitArr;
+	bitset<1> carry(0);
+	for (int i = 0; i < 128; i++) {
+		int count = 0;
+		bitArr[i] = e[i] ^ f[i] ^ carry[0];
+		if (e[i] == 1) count++;
+		if (f[i] == 1) count++;
+		if (carry[0] == 1) count++;
+		if (count > 1) carry[0] = 1;
+		else carry[0] = 0;
+	}
+	if (e[127] == f[127]) {
+		if (e[127] == 0 && bitArr[127] == 1) return result;
+		if (e[127] == 1 && bitArr[127] == 0) return result;
+	}
+	result = *toQInt(bitArr.to_string(), 2);
+	return result;
+}
+
+QInt operator-(const QInt& q1, const QInt& q2) {
+	QInt tmp = q2;
+	string base10 = tmp.toBase10();
+	if (base10[0] == '-') base10.erase(base10.begin());
+	else base10.insert(base10.begin(), '-');
+	tmp = *toQInt(base10, 10);
+	return q1 + tmp;
+}
+
+QInt operator*(const QInt& q1, const QInt& q2) {
+	QInt tmp1 = q1, tmp2 = q2;
+	string a = tmp1.toBase2(), b = tmp2.toBase2();
+	int count = 0;
+	bool sign = false;
+	if (a.length() == 128) 
+		count++;
+	if (b.length() == 128) 
+		count++;
+	if (count == 1) sign = true;
+	if (a.length() < b.length())
+		swap(a, b);
+	int l1 = a.length(), l2 = b.length();
+	string bitArr = "";
+	for (int i = l2 - 1; i >= 0; i--) {
+		string tmpMult = "";
+		if (b[i] == '1') tmpMult = a;
+		else tmpMult.append(l1, '0');
+		tmpMult.append(l2 - i - 1, '0');
+		bitArr.insert(bitArr.begin(), tmpMult.length() - bitArr.length(), '0');
+		int carry = 0;
+		string tmpString = "";
+		for (int j = bitArr.length() - 1; j >= 0; j--) {
+			int count = 0;
+			int c = (bitArr[j]-48) ^ (tmpMult[j]-48) ^ (carry);
+			if (bitArr[j] == '1') count++;
+			if (tmpMult[j] == '1') count++;
+			if (carry == 1) count++;
+			if (count > 1) carry = 1;
+			else carry = 0;
+			bitArr[j] = c + 48;
+		}
+		if (carry == 1) {
+			bitArr.insert(bitArr.begin(), '1');
+		}
+	}
+	QInt result;
+	bitset<128> tmpArr(bitArr);
+	if (sign == false && tmpArr[127] == 1) return result;
+	if (sign == true && tmpArr[127] == 0) return result;
+	bitArr = bitArr.substr(bitArr.length() - 128);
+	result = *toQInt(bitArr, 2);
+	return result;
+}
+
+QInt operator/(const QInt& q1, const QInt& q2) {
+	QInt tmp1 = q1, tmp2 = q2;
+	string a = tmp1.toBase2();
+	string b = tmp2.toBase2();
+	int count = 0;
+	bool sign = false;
+	if (a.length() == 128) {
+		count++;
+		int l1 = a.length();
+		for (int i = l1 - 1; i >= 0; i--) {
+			if (a[i] == '1') {
+				a[i] = '0';
+				break;
+			}
+			else {
+				a[i] = '1';
+			}
+		}
+		for (int i = 0; i < l1; i++) {
+			a[i] = !(a[i] - 48) + 48;
+		}
+		while (a[0] == '0') a.erase(a.begin());
+	}
+	if (b.length() == 128) {
+		count++;
+		int l2 = b.length();
+		for (int i = l2 - 1; i >= 0; i--) {
+			if (b[i] == '1') {
+				b[i] = '0';
+				break;
+			}
+			else {
+				b[i] = '1';
+			}
+		}
+		for (int i = 0; i < l2; i++) {
+			b[i] = !(b[i] - 48) + 48;
+		}
+		while (b[0] == '0') b.erase(b.begin());
+	}
+	if (count == 1) sign = true;
+	int pos = 0;
+	string dividend = "", quotient = "";
+	dividend += a[pos];
+	int l = a.length();
+	while (pos < l) {
+		if (isSmaller(dividend, b)) {
+			pos++;
+			dividend += a[pos];
+		}
+		else {
+			break;
+		}
+	}
+	while (pos < l) {
+		if (isSmaller(dividend, b) == false) {
+			quotient += '1';
+			int carry = 0;
+			int dl = dividend.length();
+			string tmpDivisor = b;
+			tmpDivisor.insert(0, dl - tmpDivisor.length(), '0');
+			for (int i = dl - 1; i >= 0; i--) {
+				int count = 0;
+				dividend[i] = ((dividend[i] - 48) ^ (tmpDivisor[i] - 48) ^ carry) + 48;
+				if (dividend[i] == '1') count++;
+				if (tmpDivisor[i] == '1') count++;
+				if (carry == 1) count++;
+				if (count > 1) carry = 1;
+			}
+		}
+		else {
+			quotient += '0';
+		}
+		pos++; 
+		while (dividend[0] == '0') dividend.erase(dividend.begin());
+		dividend += a[pos];
+	}
+	bitset<128> tmp(quotient);
+	quotient = tmp.to_string();
+	QInt result;
+	if (sign == true) {
+		for (int i = 127; i >= 0; i--) {
+			quotient[i] = !(quotient[i] - 48) + 48;
+		}
+		for (int i = 127; i >= 0; i--) {
+			if (quotient[i] == '0') {
+				quotient[i] = '1';
+				break;
+			}
+			else {
+				quotient[i] = '0';
+			}
+		}
+	}
+	else {
+		if (tmp[127] == 1) return result;
+	}
+	result = *toQInt(quotient, 2);
+	return result;
 }
 
 string readFile(const char* input)
