@@ -1,0 +1,5 @@
+﻿  Function.cpp
+  Main.cpp
+  Generating Code...
+E:\Tri\Project2019\Project1_ComputerArchitecture\Project1_ComputerArchitecture\Function.cpp(178): warning C4715: 'readFile': not all control paths return a value
+  Project1_ComputerArchitecture.vcxproj -> E:\Tri\Project2019\Project1_ComputerArchitecture\Debug\Project1_ComputerArchitecture.exe
