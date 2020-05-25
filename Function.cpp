@@ -398,10 +398,40 @@ QInt operator*(const QInt& q1, const QInt& q2) {
 	string a = tmp1.toBase2(), b = tmp2.toBase2();
 	int count = 0;
 	bool sign = false;
-	if (a.length() == 128) 
+	if (a.length() == 128) {
 		count++;
-	if (b.length() == 128) 
+		int l1 = a.length();
+		for (int i = l1 - 1; i >= 0; i--) {
+			if (a[i] == '1') {
+				a[i] = '0';
+				break;
+			}
+			else {
+				a[i] = '1';
+			}
+		}
+		for (int i = 0; i < l1; i++) {
+			a[i] = !(a[i] - 48) + 48;
+		}
+		while (a[0] == '0') a.erase(a.begin());
+	}
+	if (b.length() == 128) {
 		count++;
+		int l2 = b.length();
+		for (int i = l2 - 1; i >= 0; i--) {
+			if (b[i] == '1') {
+				b[i] = '0';
+				break;
+			}
+			else {
+				b[i] = '1';
+			}
+		}
+		for (int i = 0; i < l2; i++) {
+			b[i] = !(b[i] - 48) + 48;
+		}
+		while (b[0] == '0') b.erase(b.begin());
+	}
 	if (count == 1) sign = true;
 	if (a.length() < b.length())
 		swap(a, b);
@@ -430,10 +460,25 @@ QInt operator*(const QInt& q1, const QInt& q2) {
 		}
 	}
 	QInt result;
-	bitset<128> tmpArr(bitArr);
-	if (sign == false && tmpArr[127] == 1) return result;
-	if (sign == true && tmpArr[127] == 0) return result;
-	bitArr = bitArr.substr(bitArr.length() - 128);
+	if (sign == true) {
+		if (isSmaller(bitArr, minBase2) == false && bitArr != minBase2) return result;
+		bitArr.insert(0, 128 - bitArr.length(), '0');
+		for (int i = 0; i < bitArr.length(); i++) {
+			bitArr[i] = !(bitArr[i] - 48) + 48;
+		}
+		for (int i = bitArr.length() - 1; i >= 0; i--) {
+			if (bitArr[i] == '0') {
+				bitArr[i] = '1';
+				break;
+			}
+			else {
+				bitArr[i] = '0';
+			}
+		}
+	}
+	else {
+		if (bitArr.length() > 127) return result;
+	}
 	result = *toQInt(bitArr, 2);
 	return result;
 }
@@ -443,7 +488,7 @@ QInt operator/(const QInt& q1, const QInt& q2) {
 	string a = tmp1.toBase2();
 	string b = tmp2.toBase2();
 	int count = 0;
-	bool sign = false;
+	bool sign = false;	
 	if (a.length() == 128) {
 		count++;
 		int l1 = a.length();
@@ -506,6 +551,7 @@ QInt operator/(const QInt& q1, const QInt& q2) {
 				if (tmpDivisor[i] == '1') count++;
 				if (carry == 1) count++;
 				if (count > 1) carry = 1;
+				else carry = 0;
 			}
 		}
 		else {
