@@ -19,9 +19,17 @@ public:
 	string toBase2();
 	string toBase10();
 	string toBase16();
+	friend QInt operator&(const QInt& q1, const QInt& q2);
+	friend QInt operator|(const QInt& q1, const QInt& q2);
+	friend QInt operator^(const QInt& q1, const QInt& q2);
+	friend QInt operator~(const QInt& q);
+	void operator=(const QInt& q);
+	friend QInt operator+(const QInt& q1, const QInt& q2);
+	friend QInt operator-(const QInt& q1, const QInt& q2);
+	friend QInt operator*(const QInt& q1, const QInt& q2);
+	friend QInt operator/(const QInt& q1, const QInt& q2);
 };
 
-QInt* toQInt(string number, int oldBase);
 bool isSmaller(string str1, string str2);
 string largeSubtract(string str1, string str2);
 string largeSum(string str1, string str2);
@@ -31,6 +39,7 @@ string divBy2(string number);
 string base16Table(char c);
 char base16Table(string s);
 string strToBase2(string number, int oldBase);
+QInt* toQInt(string number, int oldBase);
 
 string readFile(const char* input);
 string readLine(int num, string inputStr);
