@@ -164,7 +164,7 @@ char base16Table(string s) {
 	if (s == "1101") return 'D';
 	if (s == "1110") return 'E';
 	if (s == "1111") return 'F';
-	return NULL;
+	return '\0';
 }
 
 string strToBase2(string number, int oldBase) {
