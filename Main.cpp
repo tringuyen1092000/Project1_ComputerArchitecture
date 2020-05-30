@@ -15,11 +15,5 @@ int main()
 		line++;
 	}
 	writeFile("output.txt", outputStr);
-
-	// string input = readLine(13, inputStr);
-	// string opr = operation(input, p1, p2);
-	// outputStr += result(p1, p2, opr);
-
-	cout << outputStr << endl;
 	return 0;
 }
