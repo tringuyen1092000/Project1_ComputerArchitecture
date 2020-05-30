@@ -767,12 +767,12 @@ string result(int p1, int p2, string opr)
 					}
 					case 7290:// rol
 					{
-						out = ROL(*q, p1);
+						out = ROL(*q, 2);
 						break;
 					}
 					case 7296:// ror
 					{
-						out = ROR(*q, p1);
+						out = ROR(*q, 2);
 						break;
 					}
 				}
