@@ -30,6 +30,8 @@ public:
 	friend QInt operator-(const QInt& q1, const QInt& q2);
 	friend QInt operator*(const QInt& q1, const QInt& q2);
 	friend QInt operator/(const QInt& q1, const QInt& q2);
+	friend QInt operator<<(QInt q, int x);
+	friend QInt operator>>(QInt q, int x);
 };
 
 bool isSmaller(string str1, string str2);
@@ -43,9 +45,16 @@ char base16Table(string s);
 string strToBase2(string number, int oldBase);
 QInt* toQInt(string number, int oldBase);
 
-string readFile(const char* input);
+QInt ROR(QInt q, int n);
+QInt ROL(QInt q, int n);
+
+string readFile(const char* name);
 string readLine(int num, string inputStr);
 bool isNum(string str, int pos);
 int strToNum(string str, int &pos);
+string toStr(QInt q, int base);
 int countSpace(string str, int pos);
 string operation(string inputStr, int& p1, int& p2);
+string result(int p1, int p2, string opr);
+void writeFile(const char* name, string outputStr);
+int countLine(string inputStr);

@@ -585,9 +585,69 @@ QInt operator/(const QInt& q1, const QInt& q2) {
 	return result;
 }
 
-string readFile(const char* input)
+QInt operator<<(QInt q, int x)
 {
-	fstream inp(input);
+	bitset<128> temp(q.toBase2());
+	string temp1 = strToBase2(temp.to_string(), 2);
+	for (int i = 0; i < x; i++) {
+		for (int j = 0; j < 128; j++) {
+			if (j == 127) {
+				temp1[j] = '0';
+				break;
+			}
+			temp1[j] = temp1[j + 1];
+		}
+	}
+	temp1[0] = '0';
+	QInt result = *toQInt(temp1, 2);
+	return result;
+}
+
+QInt operator>>(QInt q, int x)
+{
+	bitset<128> temp(q.toBase2());
+	string temp1 = strToBase2(temp.to_string(), 2);
+	for (int i = 0; i < x; i++) {
+		for (int j = 127; j > 0; j--) {
+			temp1[j] = temp1[j - 1];
+		}
+	}
+	QInt result = *toQInt(temp1, 2);
+	return result;
+}
+
+QInt ROL(QInt q, int n)
+{
+	bitset<128> temp(q.toBase2());
+	string temp1 = strToBase2(temp.to_string(), 2);
+	for (int j = 0; j < 128; j++) {
+		if (j == 127) {
+			temp1[j] = temp1[1];
+			break;
+		}
+		temp1[j] = temp1[j + 1];
+	}
+	QInt result = *toQInt(temp1, n);
+	return result;
+}
+
+QInt ROR(QInt q, int n)
+{
+	bitset<128> temp(q.toBase2());
+	string temp1 = strToBase2(temp.to_string(), 2);
+	temp1[0] = temp1[127];
+	for (int j = 127; j > 0; j--) {
+		temp1[j] = temp1[j - 1];
+	}
+	temp[1] = temp1[0];
+	temp[0] = '0';
+	QInt result = *toQInt(temp1, n);
+	return result;
+}
+
+string readFile(const char* name)
+{
+	fstream inp(name);
 	if (!inp)
 	{
 		cerr << "Unable to open file input.txt";
@@ -650,6 +710,7 @@ int countSpace(string str, int pos)
 
 string operation(string str, int& p1, int& p2)
 {
+	p2 = 0;
 	string opr;
 	int i = 0, size = 0;
 	p1 = strToNum(str, i);
@@ -662,4 +723,116 @@ string operation(string str, int& p1, int& p2)
 	}
 	else opr = str.substr(i);
 	return opr;
+}
+
+string toStr(QInt q, int base)
+{
+	if (base == 2) return q.toBase2();
+	else if (base == 10) return q.toBase10();
+	else return q.toBase16();
+}
+
+string result(int p1, int p2, string opr)
+{
+	string output;
+	if (p2 == p1)
+	{
+		opr.pop_back();
+		QInt* q = toQInt(opr, p1);
+		output = toStr(*q, p2);
+	}
+	else 
+	{
+		if (p2)// If p2 exist
+		{
+			opr.pop_back();
+			QInt* q = toQInt(opr, p1);
+			output = toStr(*q, p2);
+		}
+		else
+		{
+			if (countSpace(opr, 0) == 1)
+			{
+				int i = 0;
+				int temp = strToNum(opr, i);
+				opr = opr.substr(i + 1);
+				opr.pop_back();
+				QInt* q = toQInt(opr, p1), out;
+				switch(temp)
+				{
+					case 78:// ~
+					{
+						out = ~*q;
+						break;
+					}
+					case 7290:// rol
+					{
+						out = ROL(*q, p1);
+						break;
+					}
+					case 7296:// ror
+					{
+						out = ROR(*q, p1);
+						break;
+					}
+				}
+				output = toStr(out, p1);
+			}
+			else
+			{
+				string x, y, sign;
+				int i = 0;
+				for (i; opr[i] != ' '; i++)
+					x += opr[i];
+				i++;
+				for (i; opr[i] != ' '; i++)
+					sign += opr[i];
+				y = opr.substr(i + 1);
+				y.pop_back();
+				QInt* a = toQInt(x, p1);
+				QInt* b;
+				QInt result;
+				if (sign != "<<" && sign != ">>")
+				{
+					b = toQInt(y, p1);
+					if (sign == "+") result = *a + *b;
+					if (sign == "-") result = *a - *b;
+					if (sign == "*") result = *a * *b;
+					if (sign == "/") result = *a / *b;
+					if (sign == "&") result = *a & *b;
+					if (sign == "|") result = *a | *b;
+					if (sign == "^") result = *a ^ *b;
+				}
+				else
+				{
+					int n = 0;
+					for(int i = 0; i < y.size(); i++)
+					{
+						n *= 10;
+						n += y[i] - 48;
+					}
+					if(sign == "<<") result = *a << n;
+					else result = *a >> n;
+				}
+				output = toStr(result, p1);
+			}
+		}
+	}
+	output += '\n';
+	return output;
+}
+
+int countLine(string inputStr)
+{
+	int count = 0;
+	for (int i = 0; i < inputStr.size(); i++)
+		if (inputStr[i] == '\n') count++;
+	return count;
+}
+
+void writeFile(const char* name, string outputStr)
+{
+	fstream outp(name, ios::out);
+	for (int i = 0; i < outputStr.size(); i++)
+		outp << outputStr[i];
 }
