@@ -635,12 +635,11 @@ QInt ROR(QInt q, int n)
 {
 	bitset<128> temp(q.toBase2());
 	string temp1 = strToBase2(temp.to_string(), 2);
-	temp1[0] = temp1[127];
+	char x = temp1[127];
 	for (int j = 127; j > 0; j--) {
 		temp1[j] = temp1[j - 1];
 	}
-	temp[1] = temp1[0];
-	temp[0] = '0';
+	temp1[0] = x;
 	QInt result = *toQInt(temp1, n);
 	return result;
 }
