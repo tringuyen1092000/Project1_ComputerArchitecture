@@ -623,7 +623,7 @@ QInt ROL(QInt q, int n)
 	char c = temp1[1];
 	for (int j = 0; j < 128; j++) {
 		if (j == 127) {
-			temp1[j] = x;
+			temp1[j] = c;
 			break;
 		}
 		temp1[j] = temp1[j + 1];
