@@ -6,7 +6,6 @@ int main()
 	string inputStr, outputStr;
 	inputStr = readFile("input.txt");
 	sumLine = countLine(inputStr);
-	cout << sumLine << endl;
 	while (line < sumLine)
 	{
 		string input = readLine(line, inputStr);
