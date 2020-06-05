@@ -620,13 +620,15 @@ QInt ROL(QInt q, int n)
 {
 	bitset<128> temp(q.toBase2());
 	string temp1 = strToBase2(temp.to_string(), 2);
+	char c = temp1[1];
 	for (int j = 0; j < 128; j++) {
 		if (j == 127) {
-			temp1[j] = temp1[1];
+			temp1[j] = x;
 			break;
 		}
 		temp1[j] = temp1[j + 1];
 	}
+	temp1[0] = '0';
 	QInt result = *toQInt(temp1, n);
 	return result;
 }
